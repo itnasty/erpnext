@@ -1,19 +1,15 @@
 # Copyright (c) 2021, Frappe Technologies Pvt. Ltd. and Contributors
 # See license.txt
-import unittest
 
 import frappe
 from frappe.tests import IntegrationTestCase
-from frappe.utils import cint, flt, getdate, now_datetime
+from frappe.utils import cint, flt, now_datetime
 
 from erpnext.assets.doctype.asset.depreciation import post_depreciation_entries
 from erpnext.assets.doctype.asset.test_asset import (
 	create_asset,
 	create_asset_data,
 	set_depreciation_settings_in_company,
-)
-from erpnext.assets.doctype.asset_depreciation_schedule.asset_depreciation_schedule import (
-	get_asset_depr_schedule_doc,
 )
 from erpnext.stock.doctype.item.test_item import create_item
 from erpnext.stock.doctype.serial_and_batch_bundle.test_serial_and_batch_bundle import (
@@ -98,7 +94,7 @@ class TestAssetCapitalization(IntegrationTestCase):
 
 		# Test Target Asset values
 		target_asset = frappe.get_doc("Asset", asset_capitalization.target_asset)
-		self.assertEqual(target_asset.gross_purchase_amount, total_amount)
+		self.assertEqual(target_asset.net_purchase_amount, total_amount)
 		self.assertEqual(target_asset.purchase_amount, total_amount)
 		self.assertEqual(target_asset.status, "Work In Progress")
 
@@ -193,7 +189,7 @@ class TestAssetCapitalization(IntegrationTestCase):
 
 		# Test Target Asset values
 		target_asset = frappe.get_doc("Asset", asset_capitalization.target_asset)
-		self.assertEqual(target_asset.gross_purchase_amount, total_amount)
+		self.assertEqual(target_asset.net_purchase_amount, total_amount)
 		self.assertEqual(target_asset.purchase_amount, total_amount)
 
 		# Test Consumed Asset values
@@ -273,7 +269,7 @@ class TestAssetCapitalization(IntegrationTestCase):
 
 		# Test Target Asset values
 		target_asset = frappe.get_doc("Asset", asset_capitalization.target_asset)
-		self.assertEqual(target_asset.gross_purchase_amount, total_amount)
+		self.assertEqual(target_asset.net_purchase_amount, total_amount)
 		self.assertEqual(target_asset.purchase_amount, total_amount)
 		self.assertEqual(target_asset.status, "Work In Progress")
 
@@ -333,7 +329,7 @@ class TestAssetCapitalization(IntegrationTestCase):
 		self.assertEqual(asset_capitalization.service_items_total, service_amount)
 
 		target_asset = frappe.get_doc("Asset", asset_capitalization.target_asset)
-		self.assertEqual(target_asset.gross_purchase_amount, total_amount)
+		self.assertEqual(target_asset.net_purchase_amount, total_amount)
 		self.assertEqual(target_asset.purchase_amount, total_amount)
 
 		expected_gle = {
@@ -528,8 +524,8 @@ def create_depreciation_asset(**args):
 	asset.purchase_date = args.purchase_date or "2020-01-01"
 	asset.available_for_use_date = args.available_for_use_date or asset.purchase_date
 
-	asset.gross_purchase_amount = args.asset_value or 100000
-	asset.purchase_amount = asset.gross_purchase_amount
+	asset.net_purchase_amount = args.asset_value or 100000
+	asset.purchase_amount = asset.net_purchase_amount
 
 	finance_book = asset.append("finance_books")
 	finance_book.depreciation_start_date = args.depreciation_start_date or "2020-12-31"
